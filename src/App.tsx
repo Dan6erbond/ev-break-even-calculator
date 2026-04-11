@@ -40,6 +40,7 @@ import {
   Coins,
   Fuel,
   Globe,
+  Heart,
   Info,
   TrendingUp,
   Zap,
@@ -63,7 +64,7 @@ import Expenses from "./components/expenses"
 import { NumberInput } from "@/components/ui/number-input"
 import { getNumberFormatParts } from "@/lib/utils"
 import { AnimatedNumber } from "@/components/ui/animated-number"
-
+import { FaGithub } from "react-icons/fa"
 export default function App() {
   const isCronitorLoaded = useRef(false)
 
@@ -194,7 +195,7 @@ export default function App() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-slate-50/50 p-4 font-sans text-slate-900 md:p-8">
-        <div className="mx-auto max-w-6xl space-y-8">
+        <main className="mx-auto max-w-6xl space-y-8">
           {/* Header */}
           <header className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
@@ -816,7 +817,48 @@ export default function App() {
               </Card>
             </div>
           </div>
-        </div>
+        </main>
+
+        <footer className="mt-12 border-t border-slate-200 py-8">
+          <div className="flex flex-col items-center justify-center gap-3 text-center">
+            {/* Credit */}
+            <div className="flex items-center gap-2 text-sm text-slate-500">
+              <span>Made with</span>
+              <Heart className="h-4 w-4 text-red-500" />
+              <span>by</span>
+
+              <a
+                href="https://reddit.com/u/Dan6erbond2"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-slate-700 hover:underline"
+              >
+                u/Dan6erbond2
+              </a>
+            </div>
+
+            {/* Revline (primary secondary action) */}
+            <a
+              href="https://revline.one/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm font-semibold text-slate-800 transition-colors hover:text-black"
+            >
+              Revline — track, manage and understand your vehicles
+            </a>
+
+            {/* GitHub (tertiary) */}
+            <a
+              href="https://github.com/Dan6erbond/ev-break-even-calculator"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 text-xs text-slate-500 hover:underline"
+            >
+              <FaGithub className="h-3 w-3" />
+              View source on GitHub
+            </a>
+          </div>
+        </footer>
       </div>
     </TooltipProvider>
   )
