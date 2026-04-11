@@ -194,7 +194,7 @@ export default function App() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-slate-50/50 p-4 font-sans text-slate-900 md:p-8">
+      <div className="min-h-screen bg-background p-4 font-sans text-foreground md:p-8">
         <main className="mx-auto max-w-6xl space-y-8">
           {/* Header */}
           <header className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
@@ -203,7 +203,7 @@ export default function App() {
                 <Zap className="h-8 w-8 text-green-600" />
                 EV Break-Even Calculator
               </h1>
-              <p className="mt-1 text-slate-500">
+              <p className="mt-1 text-muted-foreground">
                 Compare the long-term costs of switching to electric.
               </p>
             </div>
@@ -235,7 +235,7 @@ export default function App() {
             {/* Inputs Column */}
             <div className="space-y-6 lg:col-span-5">
               {/* Distance & General */}
-              <Card className="border-slate-200 shadow-sm">
+              <Card>
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Calendar className="h-5 w-5 text-blue-500" />
@@ -282,7 +282,7 @@ export default function App() {
               </Card>
 
               {/* Gas Vehicle */}
-              <Card className="border-slate-200 shadow-sm">
+              <Card>
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Fuel className="h-5 w-5 text-orange-500" />
@@ -400,7 +400,7 @@ export default function App() {
               </Card>
 
               {/* Electric Vehicle */}
-              <Card className="border-slate-200 shadow-sm">
+              <Card>
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Zap className="h-5 w-5 text-green-500" />
@@ -461,7 +461,7 @@ export default function App() {
                       Electricity Price
                       <Tooltip>
                         <TooltipTrigger>
-                          <Info className="h-3 w-3 text-slate-400" />
+                          <Info className="h-3 w-3 text-muted-foreground" />
                         </TooltipTrigger>
                         <TooltipContent>
                           Average residential rate in your area
@@ -507,9 +507,9 @@ export default function App() {
             <div className="space-y-6 lg:col-span-7">
               {/* Summary Dashboard */}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Card className="overflow-hidden border-l-4 border-l-green-500 bg-white shadow-sm">
+                <Card className="overflow-hidden border-l-4 border-l-green-500">
                   <CardContent className="p-4">
-                    <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
+                    <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
                       Annual Savings
                     </p>
                     <p className="font-mono text-2xl font-bold text-green-600">
@@ -523,9 +523,9 @@ export default function App() {
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="overflow-hidden border-l-4 border-l-blue-500 bg-white shadow-sm">
+                <Card className="overflow-hidden border-l-4 border-l-blue-500">
                   <CardContent className="p-4">
-                    <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
+                    <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
                       Break-Even Time
                     </p>
                     <p className="font-mono text-2xl font-bold text-blue-600">
@@ -543,9 +543,9 @@ export default function App() {
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="overflow-hidden border-l-4 border-l-orange-500 bg-white shadow-sm">
+                <Card className="overflow-hidden border-l-4 border-l-orange-500">
                   <CardContent className="p-4">
-                    <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
+                    <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
                       Break-Even Distance
                     </p>
                     <p className="font-mono text-2xl font-bold text-orange-600">
@@ -566,10 +566,10 @@ export default function App() {
               </div>
 
               {/* Chart */}
-              <Card className="aspect-video border-slate-200 shadow-sm">
+              <Card className="aspect-video">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="h-5 w-5 text-indigo-500" />
+                    <TrendingUp className="h-5 w-5 text-primary" />
                     Total Cost Over Time
                   </CardTitle>
                   <CardDescription>
@@ -701,20 +701,20 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <Card className="border-indigo-100 bg-indigo-50 shadow-none">
+                <Card className="border-primary bg-primary/10 shadow-none">
                   <CardContent className="flex gap-4 p-6">
-                    <div className="mt-1 h-fit rounded-full bg-indigo-600 p-2">
+                    <div className="mt-1 h-fit rounded-full bg-primary p-2">
                       <CheckCircle2 className="h-5 w-5 text-white" />
                     </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-indigo-900">
+                    <div className="space-y-2 text-primary">
+                      <h4 className="font-semibold">
                         Pro Tip: Maintenance Savings
                       </h4>
-                      <p className="text-sm leading-relaxed text-indigo-800">
+                      <p className="text-sm leading-relaxed">
                         Electric vehicles typically have much lower maintenance
                         costs. With fewer moving parts and regenerative braking,
                         you could reach your break-even point{" "}
-                        <span className="font-bold text-indigo-900">
+                        <span className="font-bold">
                           significantly faster
                         </span>{" "}
                         than the fuel savings alone suggest.
@@ -725,7 +725,7 @@ export default function App() {
               </motion.div>
 
               {/* Detailed Breakdown */}
-              <Card className="border-slate-200 shadow-sm">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Coins className="h-5 w-5 text-yellow-600" />
@@ -737,29 +737,33 @@ export default function App() {
                   <div className="space-y-4">
                     {/* Price difference */}
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-slate-600">
+                      <span className="text-muted-foreground">
                         Initial Price Premium
                       </span>
-                      <span className="font-mono font-medium text-red-600">
+                      <span className="font-mono font-medium text-destructive">
                         +{formatCurrency(results.priceDifference)}
                       </span>
                     </div>
 
                     {/* GAS */}
                     <div className="space-y-2 border-t pt-3">
-                      <p className="text-sm font-semibold text-slate-700">
+                      <p className="text-sm font-semibold">
                         Gas Vehicle
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Fuel (annual)</span>
+                        <span className="text-muted-foreground">
+                          Fuel (annual)
+                        </span>
                         <span className="font-mono">
                           {formatCurrency(results.breakdown.gas.energy)}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Ownership costs</span>
+                        <span className="text-muted-foreground">
+                          Ownership costs
+                        </span>
                         <span className="font-mono">
                           {formatCurrency(results.breakdown.gas.expenses)}
                         </span>
@@ -775,12 +779,12 @@ export default function App() {
 
                     {/* EV */}
                     <div className="space-y-2 border-t pt-3">
-                      <p className="text-sm font-semibold text-slate-700">
+                      <p className="text-sm font-semibold">
                         Electric Vehicle
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500">
+                        <span className="text-muted-foreground">
                           Electricity (annual)
                         </span>
                         <span className="font-mono">
@@ -789,7 +793,9 @@ export default function App() {
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Ownership costs</span>
+                        <span className="text-muted-foreground">
+                          Ownership costs
+                        </span>
                         <span className="font-mono">
                           {formatCurrency(results.breakdown.ev.expenses)}
                         </span>
@@ -819,10 +825,10 @@ export default function App() {
           </div>
         </main>
 
-        <footer className="mt-12 border-t border-slate-200 py-8">
+        <footer className="mt-12 border border-t py-8">
           <div className="flex flex-col items-center justify-center gap-3 text-center">
             {/* Credit */}
-            <div className="flex items-center gap-2 text-sm text-slate-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Made with</span>
               <Heart className="h-4 w-4 text-red-500" />
               <span>by</span>
@@ -852,7 +858,7 @@ export default function App() {
               href="https://github.com/Dan6erbond/ev-break-even-calculator"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1 text-xs text-slate-500 hover:underline"
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:underline"
             >
               <FaGithub className="h-3 w-3" />
               View source on GitHub
