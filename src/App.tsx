@@ -429,6 +429,7 @@ export default function App() {
                         onValueChange={(v) => v && setEvEfficiency(v)}
                         thousandSeparator={groupSeparator}
                         decimalSeparator={decimalSeparator}
+                        decimalScale={2}
                       />
                     </div>
                     <div className="space-y-2">
@@ -473,6 +474,7 @@ export default function App() {
                       onValueChange={(v) => v && setElecPrice(v)}
                       thousandSeparator={groupSeparator}
                       decimalSeparator={decimalSeparator}
+                      decimalScale={2}
                       suffix={" " + currency + "/kWh"}
                     />
                   </div>
