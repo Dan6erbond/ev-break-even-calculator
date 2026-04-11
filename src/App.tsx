@@ -31,6 +31,7 @@ import {
   toKWh100km,
   toL100km,
 } from "@/lib/calculator"
+import * as Cronitor from "@cronitorio/cronitor-rum"
 import {
   Calendar,
   CheckCircle2,
@@ -41,7 +42,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   CartesianGrid,
   Legend,
@@ -80,6 +81,18 @@ function useLocalStorage<T>(key: string, initialValue: T) {
 }
 
 export default function App() {
+  const isCronitorLoaded = useRef(false)
+
+  useEffect(() => {
+    if (import.meta.env.PROD && !isCronitorLoaded.current) {
+      Cronitor.load("949c1af1c3c9b4b2922a1b73c7fcf84d", {
+        debug: false,
+        trackMode: "history",
+      })
+      isCronitorLoaded.current = true
+    }
+  }, [isCronitorLoaded])
+
   // Gas Vehicle State
   const [gasPrice, setGasPrice] = useLocalStorage("gasPrice", 30000)
   const [gasEfficiency, setGasEfficiency] = useLocalStorage("gasEfficiency", 25)
