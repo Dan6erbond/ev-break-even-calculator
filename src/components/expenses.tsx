@@ -66,7 +66,7 @@ export default function Expenses<T extends string>({
 
       <div className="space-y-3">
         {expenses.map((expense, index) => (
-          <div key={index} className="grid grid-cols-6 items-end gap-2">
+          <div key={index} className="grid grid-cols-3 md:grid-cols-6 items-end gap-2">
             {/* Type */}
             <div className="col-span-3 space-y-2">
               <Label className="text-xs">Type</Label>

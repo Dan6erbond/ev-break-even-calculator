@@ -566,7 +566,7 @@ export default function App() {
               </div>
 
               {/* Chart */}
-              <Card className="aspect-video">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <TrendingUp className="h-5 w-5 text-primary" />
@@ -576,8 +576,8 @@ export default function App() {
                     Includes purchase price and cumulative fuel/energy costs.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="h-full">
+                <CardContent>
+                  <div className="aspect-9/16 md:aspect-video">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
                         data={results.chartData}
@@ -714,9 +714,7 @@ export default function App() {
                         Electric vehicles typically have much lower maintenance
                         costs. With fewer moving parts and regenerative braking,
                         you could reach your break-even point{" "}
-                        <span className="font-bold">
-                          significantly faster
-                        </span>{" "}
+                        <span className="font-bold">significantly faster</span>{" "}
                         than the fuel savings alone suggest.
                       </p>
                     </div>
@@ -747,9 +745,7 @@ export default function App() {
 
                     {/* GAS */}
                     <div className="space-y-2 border-t pt-3">
-                      <p className="text-sm font-semibold">
-                        Gas Vehicle
-                      </p>
+                      <p className="text-sm font-semibold">Gas Vehicle</p>
 
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">
@@ -779,9 +775,7 @@ export default function App() {
 
                     {/* EV */}
                     <div className="space-y-2 border-t pt-3">
-                      <p className="text-sm font-semibold">
-                        Electric Vehicle
-                      </p>
+                      <p className="text-sm font-semibold">Electric Vehicle</p>
 
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">
