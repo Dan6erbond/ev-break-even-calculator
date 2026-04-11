@@ -576,8 +576,8 @@ export default function App() {
                     Includes purchase price and cumulative fuel/energy costs.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="aspect-9/16 md:aspect-video">
+                <CardContent className="overflow-x-auto">
+                  <div className="min-w-175 md:min-w-0 aspect-video">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
                         data={results.chartData}
