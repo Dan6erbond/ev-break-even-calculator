@@ -56,7 +56,6 @@ import {
   YAxis,
 } from "recharts"
 
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { motion } from "motion/react"
 import { useLocalStorage } from "@uidotdev/usehooks"
@@ -715,9 +714,11 @@ export default function App() {
                     Cost Breakdown
                   </CardTitle>
                 </CardHeader>
+
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="border-bottom flex items-center justify-between py-2">
+                    {/* Price difference */}
+                    <div className="flex items-center justify-between py-2">
                       <span className="text-slate-600">
                         Initial Price Premium
                       </span>
@@ -725,20 +726,66 @@ export default function App() {
                         +{formatCurrency(results.priceDifference)}
                       </span>
                     </div>
-                    <div className="border-bottom flex items-center justify-between py-2">
-                      <span className="text-slate-600">Gas Cost (Annual)</span>
-                      <span className="font-mono font-medium">
-                        {formatCurrency(results.gasCostPerYear)}
-                      </span>
+
+                    {/* GAS */}
+                    <div className="space-y-2 border-t pt-3">
+                      <p className="text-sm font-semibold text-slate-700">
+                        Gas Vehicle
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Fuel (annual)</span>
+                        <span className="font-mono">
+                          {formatCurrency(results.breakdown.gas.energy)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Ownership costs</span>
+                        <span className="font-mono">
+                          {formatCurrency(results.breakdown.gas.expenses)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between font-medium">
+                        <span>Total</span>
+                        <span className="font-mono">
+                          {formatCurrency(results.breakdown.gas.total)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="border-bottom flex items-center justify-between py-2">
-                      <span className="text-slate-600">
-                        Electricity Cost (Annual)
-                      </span>
-                      <span className="font-mono font-medium">
-                        {formatCurrency(results.evCostPerYear)}
-                      </span>
+
+                    {/* EV */}
+                    <div className="space-y-2 border-t pt-3">
+                      <p className="text-sm font-semibold text-slate-700">
+                        Electric Vehicle
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">
+                          Electricity (annual)
+                        </span>
+                        <span className="font-mono">
+                          {formatCurrency(results.breakdown.ev.energy)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Ownership costs</span>
+                        <span className="font-mono">
+                          {formatCurrency(results.breakdown.ev.expenses)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between font-medium">
+                        <span>Total</span>
+                        <span className="font-mono">
+                          {formatCurrency(results.breakdown.ev.total)}
+                        </span>
+                      </div>
                     </div>
+
+                    {/* Savings */}
                     <div className="flex items-center justify-between border-t pt-4">
                       <span className="font-semibold">
                         Estimated Monthly Savings

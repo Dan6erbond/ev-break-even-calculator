@@ -154,6 +154,18 @@ export interface CalculationResult {
     gasTotal: number
     evTotal: number
   }[]
+  breakdown: {
+    gas: {
+      energy: number
+      expenses: number
+      total: number
+    }
+    ev: {
+      energy: number
+      expenses: number
+      total: number
+    }
+  }
 }
 
 export function calculateBreakEven(params: {
@@ -172,28 +184,33 @@ export function calculateBreakEven(params: {
   distanceUnit: DistanceUnit
 }): CalculationResult {
   const annualKM = toKM(params.annualDistance, params.distanceUnit)
+
   const gasL100km = toL100km(params.gasEfficiency, params.gasEfficiencyUnit)
   const gasPricePerL = toPricePerL(params.gasFuelPrice, params.gasFuelPriceUnit)
   const evKWh100km = toKWh100km(params.evEfficiency, params.evEfficiencyUnit)
 
+  // cost per km
   const gasCostPerKM = (gasL100km / 100) * gasPricePerL
   const evCostPerKM = (evKWh100km / 100) * params.elecPrice
 
+  // annual energy costs
   const gasEnergyPerYear = gasCostPerKM * annualKM
-  const totalGasExpensesPerYear = params.gasExpenses.reduce(
-    (sum, e) => sum + e.amount,
-    0
-  )
-  const gasFixedPerYear = totalGasExpensesPerYear
-
   const evEnergyPerYear = evCostPerKM * annualKM
-  const totalEvExpensesPerYear = params.evExpenses.reduce(
+
+  // annual fixed costs
+  const gasFixedPerYear = params.gasExpenses.reduce(
     (sum, e) => sum + e.amount,
     0
   )
-  const evFixedPerYear = totalEvExpensesPerYear
 
-  const savingsPerYear = gasFixedPerYear - evFixedPerYear
+  const evFixedPerYear = params.evExpenses.reduce((sum, e) => sum + e.amount, 0)
+
+  // total annual costs
+  const gasCostPerYear = gasEnergyPerYear + gasFixedPerYear
+  const evCostPerYear = evEnergyPerYear + evFixedPerYear
+
+  // savings
+  const savingsPerYear = gasCostPerYear - evCostPerYear
   const priceDifference = params.evPrice - params.gasPrice
 
   let breakEvenYears = Infinity
@@ -204,6 +221,7 @@ export function calculateBreakEven(params: {
     breakEvenDistance = breakEvenYears * annualKM
   }
 
+  // chart
   const chartData = []
   const maxYears = Math.max(10, Math.ceil(breakEvenYears * 1.5) || 10)
   const cappedMaxYears = Math.min(maxYears, 25)
@@ -215,22 +233,34 @@ export function calculateBreakEven(params: {
       gasBase: params.gasPrice,
       gasEnergy: gasEnergyPerYear * i,
       gasFixed: gasFixedPerYear * i,
-      gasTotal: params.gasPrice + gasEnergyPerYear * i + gasFixedPerYear * i,
+      gasTotal: params.gasPrice + (gasEnergyPerYear + gasFixedPerYear) * i,
 
       evBase: params.evPrice,
       evEnergy: evEnergyPerYear * i,
       evFixed: evFixedPerYear * i,
-      evTotal: params.evPrice + evEnergyPerYear * i + evFixedPerYear * i,
+      evTotal: params.evPrice + (evEnergyPerYear + evFixedPerYear) * i,
     })
   }
 
   return {
-    gasCostPerYear: gasFixedPerYear,
-    evCostPerYear: evFixedPerYear,
+    gasCostPerYear,
+    evCostPerYear,
     savingsPerYear,
     priceDifference,
     breakEvenDistance,
     breakEvenYears,
     chartData,
+    breakdown: {
+      gas: {
+        energy: gasEnergyPerYear,
+        expenses: gasFixedPerYear,
+        total: gasCostPerYear,
+      },
+      ev: {
+        energy: evEnergyPerYear,
+        expenses: evFixedPerYear,
+        total: evCostPerYear,
+      },
+    },
   }
 }
