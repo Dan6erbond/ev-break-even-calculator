@@ -22,8 +22,10 @@ import {
 } from "@/components/ui/tooltip"
 import {
   type DistanceUnit,
+  type EVExpense,
   type EVUnit,
   type FuelPriceUnit,
+  type GasExpense,
   type GasUnit,
   calculateBreakEven,
   fromKWh100km,
@@ -42,7 +44,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import {
   CartesianGrid,
   Legend,
@@ -57,28 +59,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { motion } from "motion/react"
-
-function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    try {
-      const item = window.localStorage.getItem(key)
-      return item ? JSON.parse(item) : initialValue
-    } catch (error) {
-      console.error(error)
-      return initialValue
-    }
-  })
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue))
-    } catch (error) {
-      console.error(error)
-    }
-  }, [key, storedValue])
-
-  return [storedValue, setStoredValue] as const
-}
+import { useLocalStorage } from "@uidotdev/usehooks"
+import Expenses from "./components/expenses"
 
 export default function App() {
   const isCronitorLoaded = useRef(false)
@@ -103,6 +85,10 @@ export default function App() {
   const [gasFuelPrice, setGasFuelPrice] = useLocalStorage("gasFuelPrice", 3.5)
   const [gasFuelPriceUnit, setGasFuelPriceUnit] =
     useLocalStorage<FuelPriceUnit>("gasFuelPriceUnit", "Per Gal (US)")
+  const [gasExpenses, setGasExpenses] = useLocalStorage<GasExpense[]>(
+    "gasExpenses",
+    []
+  )
 
   // EV State
   const [evPrice, setEvPrice] = useLocalStorage("evPrice", 45000)
@@ -112,6 +98,10 @@ export default function App() {
     "mi/kWh"
   )
   const [elecPrice, setElecPrice] = useLocalStorage("elecPrice", 0.15)
+  const [evExpenses, setEvExpenses] = useLocalStorage<EVExpense[]>(
+    "evExpenses",
+    []
+  )
 
   // General State
   const [annualDistance, setAnnualDistance] = useLocalStorage(
@@ -131,10 +121,12 @@ export default function App() {
       gasEfficiency,
       gasEfficiencyUnit,
       gasFuelPriceUnit,
+      gasExpenses,
       evPrice,
       evEfficiency,
       evEfficiencyUnit,
       elecPrice,
+      evExpenses,
       annualDistance,
       distanceUnit,
     })
@@ -144,10 +136,12 @@ export default function App() {
     gasEfficiency,
     gasEfficiencyUnit,
     gasFuelPriceUnit,
+    gasExpenses,
     evPrice,
     evEfficiency,
     evEfficiencyUnit,
     elecPrice,
+    evExpenses,
     annualDistance,
     distanceUnit,
   ])
@@ -371,6 +365,22 @@ export default function App() {
                       </Select>
                     </div>
                   </div>
+                  <Expenses
+                    expenses={gasExpenses}
+                    setExpenses={setGasExpenses}
+                    defaultExpenseType="Maintenance"
+                    expenseTypes={[
+                      "Insurance",
+                      "Taxes",
+                      "Maintenance",
+                      "Tires",
+                      "Registration",
+                      "Parking",
+                      "Repairs",
+                      "Depreciation",
+                      "Other",
+                    ]}
+                  />
                 </CardContent>
               </Card>
 
@@ -443,6 +453,26 @@ export default function App() {
                       onChange={(e) => setElecPrice(Number(e.target.value))}
                     />
                   </div>
+                  <Expenses
+                    expenses={evExpenses}
+                    setExpenses={setEvExpenses}
+                    defaultExpenseType="Maintenance"
+                    expenseTypes={[
+                      "Insurance",
+                      "Taxes",
+                      "Maintenance",
+                      "Tires",
+                      "Registration",
+                      "Charging Equipment",
+                      "Public Charging Premium",
+                      "Battery Degradation Reserve",
+                      "Parking",
+                      "Repairs",
+                      "Depreciation",
+                      "Software / Subscription",
+                      "Other",
+                    ]}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -497,7 +527,7 @@ export default function App() {
               </div>
 
               {/* Chart */}
-              <Card className="border-slate-200 shadow-sm">
+              <Card className="border-slate-200 shadow-sm aspect-video">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <TrendingUp className="h-5 w-5 text-indigo-500" />
@@ -507,12 +537,12 @@ export default function App() {
                     Includes purchase price and cumulative fuel/energy costs.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-87.5 w-full">
+                <CardContent className="flex-1">
+                  <div className="h-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
                         data={results.chartData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
                       >
                         <CartesianGrid
                           strokeDasharray="3 3"
@@ -546,23 +576,79 @@ export default function App() {
                           }}
                         />
                         <Legend verticalAlign="top" height={36} />
+
                         <Line
-                          name="Gas Vehicle"
-                          type="monotone"
+                          name="Gas Total"
                           dataKey="gasTotal"
                           stroke="#f97316"
                           strokeWidth={2}
                           dot={false}
-                          activeDot={{ r: 6 }}
                         />
+
                         <Line
-                          name="Electric Vehicle"
-                          type="monotone"
+                          name="EV Total"
                           dataKey="evTotal"
                           stroke="#22c55e"
                           strokeWidth={2}
                           dot={false}
-                          activeDot={{ r: 6 }}
+                        />
+
+                        <Line
+                          name="Gas Base (Purchase)"
+                          type="monotone"
+                          dataKey="gasBase"
+                          stroke="#fb923c"
+                          strokeWidth={1}
+                          strokeDasharray="4 4"
+                          dot={false}
+                        />
+
+                        <Line
+                          name="Gas Fuel"
+                          type="monotone"
+                          dataKey="gasEnergy"
+                          stroke="#f97316"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+
+                        <Line
+                          name="Gas Expenses"
+                          type="monotone"
+                          dataKey="gasFixed"
+                          stroke="#c2410c"
+                          strokeWidth={2}
+                          strokeDasharray="5 5"
+                          dot={false}
+                        />
+
+                        <Line
+                          name="EV Base (Purchase)"
+                          type="monotone"
+                          dataKey="evBase"
+                          stroke="#86efac"
+                          strokeWidth={1}
+                          strokeDasharray="4 4"
+                          dot={false}
+                        />
+
+                        <Line
+                          name="EV Electricity"
+                          type="monotone"
+                          dataKey="evEnergy"
+                          stroke="#22c55e"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+
+                        <Line
+                          name="EV Expenses"
+                          type="monotone"
+                          dataKey="evFixed"
+                          stroke="#15803d"
+                          strokeWidth={2}
+                          strokeDasharray="5 5"
+                          dot={false}
                         />
                       </LineChart>
                     </ResponsiveContainer>

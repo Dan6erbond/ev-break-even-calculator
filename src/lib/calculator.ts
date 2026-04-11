@@ -7,6 +7,42 @@ const KM_PER_MILE = 1.609344
 const L_PER_GAL_US = 3.78541
 const L_PER_GAL_UK = 4.54609
 
+export type GasExpenseType =
+  | "Insurance"
+  | "Taxes"
+  | "Maintenance"
+  | "Tires"
+  | "Registration"
+  | "Parking"
+  | "Repairs"
+  | "Depreciation"
+  | "Other"
+
+export interface GasExpense {
+  type: GasExpenseType
+  amount: number // per year
+}
+
+export type EVExpenseType =
+  | "Insurance"
+  | "Taxes"
+  | "Maintenance"
+  | "Tires"
+  | "Registration"
+  | "Charging Equipment"
+  | "Public Charging Premium"
+  | "Battery Degradation Reserve"
+  | "Parking"
+  | "Repairs"
+  | "Depreciation"
+  | "Software / Subscription"
+  | "Other"
+
+export interface EVExpense {
+  type: EVExpenseType
+  amount: number // per year
+}
+
 /**
  * Converts gas efficiency to L/100km
  */
@@ -126,10 +162,12 @@ export function calculateBreakEven(params: {
   gasEfficiency: number
   gasEfficiencyUnit: GasUnit
   gasFuelPriceUnit: FuelPriceUnit
+  gasExpenses: GasExpense[]
   evPrice: number
   evEfficiency: number
   evEfficiencyUnit: EVUnit
   elecPrice: number // per kWh
+  evExpenses: EVExpense[]
   annualDistance: number
   distanceUnit: DistanceUnit
 }): CalculationResult {
@@ -141,9 +179,21 @@ export function calculateBreakEven(params: {
   const gasCostPerKM = (gasL100km / 100) * gasPricePerL
   const evCostPerKM = (evKWh100km / 100) * params.elecPrice
 
-  const gasCostPerYear = gasCostPerKM * annualKM
-  const evCostPerYear = evCostPerKM * annualKM
-  const savingsPerYear = gasCostPerYear - evCostPerYear
+  const gasEnergyPerYear = gasCostPerKM * annualKM
+  const totalGasExpensesPerYear = params.gasExpenses.reduce(
+    (sum, e) => sum + e.amount,
+    0
+  )
+  const gasFixedPerYear = totalGasExpensesPerYear
+
+  const evEnergyPerYear = evCostPerKM * annualKM
+  const totalEvExpensesPerYear = params.evExpenses.reduce(
+    (sum, e) => sum + e.amount,
+    0
+  )
+  const evFixedPerYear = totalEvExpensesPerYear
+
+  const savingsPerYear = gasFixedPerYear - evFixedPerYear
   const priceDifference = params.evPrice - params.gasPrice
 
   let breakEvenYears = Infinity
@@ -161,14 +211,22 @@ export function calculateBreakEven(params: {
   for (let i = 0; i <= cappedMaxYears; i++) {
     chartData.push({
       year: i,
-      gasTotal: params.gasPrice + gasCostPerYear * i,
-      evTotal: params.evPrice + evCostPerYear * i,
+
+      gasBase: params.gasPrice,
+      gasEnergy: gasEnergyPerYear * i,
+      gasFixed: gasFixedPerYear * i,
+      gasTotal: params.gasPrice + gasEnergyPerYear * i + gasFixedPerYear * i,
+
+      evBase: params.evPrice,
+      evEnergy: evEnergyPerYear * i,
+      evFixed: evFixedPerYear * i,
+      evTotal: params.evPrice + evEnergyPerYear * i + evFixedPerYear * i,
     })
   }
 
   return {
-    gasCostPerYear,
-    evCostPerYear,
+    gasCostPerYear: gasFixedPerYear,
+    evCostPerYear: evFixedPerYear,
     savingsPerYear,
     priceDifference,
     breakEvenDistance,
