@@ -62,6 +62,7 @@ import { useLocalStorage } from "@uidotdev/usehooks"
 import Expenses from "./components/expenses"
 import { NumberInput } from "@/components/ui/number-input"
 import { getNumberFormatParts } from "@/lib/utils"
+import { AnimatedNumber } from "@/components/ui/animated-number"
 
 export default function App() {
   const isCronitorLoaded = useRef(false)
@@ -310,6 +311,7 @@ export default function App() {
                         onValueChange={(v) => v && setGasEfficiency(v)}
                         thousandSeparator={groupSeparator}
                         decimalSeparator={decimalSeparator}
+                        decimalScale={2}
                       />
                     </div>
                     <div className="space-y-2">
@@ -508,7 +510,10 @@ export default function App() {
                       Annual Savings
                     </p>
                     <p className="font-mono text-2xl font-bold text-green-600">
-                      {formatCurrency(results.savingsPerYear)}
+                      <AnimatedNumber
+                        value={results.savingsPerYear}
+                        format={(v) => formatCurrency(v)}
+                      />
                     </p>
                     <p className="mt-1 text-[10px] text-slate-400">
                       Compared to gas vehicle
@@ -521,9 +526,14 @@ export default function App() {
                       Break-Even Time
                     </p>
                     <p className="font-mono text-2xl font-bold text-blue-600">
-                      {results.breakEvenYears === Infinity
-                        ? "Never"
-                        : `${results.breakEvenYears.toFixed(1)} Years`}
+                      {results.breakEvenYears === Infinity ? (
+                        "Never"
+                      ) : (
+                        <AnimatedNumber
+                          value={results.breakEvenYears}
+                          format={(v) => `${v.toFixed(1)} Years`}
+                        />
+                      )}
                     </p>
                     <p className="mt-1 text-[10px] text-slate-400">
                       Based on current usage
@@ -536,9 +546,14 @@ export default function App() {
                       Break-Even Distance
                     </p>
                     <p className="font-mono text-2xl font-bold text-orange-600">
-                      {results.breakEvenDistance === Infinity
-                        ? "N/A"
-                        : formatDistance(results.breakEvenDistance)}
+                      {results.breakEvenDistance === Infinity ? (
+                        "N/A"
+                      ) : (
+                        <AnimatedNumber
+                          value={results.breakEvenDistance}
+                          format={(v) => formatDistance(v)}
+                        />
+                      )}
                     </p>
                     <p className="mt-1 text-[10px] text-slate-400">
                       Total mileage required
