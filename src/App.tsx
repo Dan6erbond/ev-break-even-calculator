@@ -61,6 +61,8 @@ import { Label } from "@/components/ui/label"
 import { motion } from "motion/react"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import Expenses from "./components/expenses"
+import { NumberInput } from "@/components/ui/number-input"
+import { getNumberFormatParts } from "@/lib/utils"
 
 export default function App() {
   const isCronitorLoaded = useRef(false)
@@ -74,6 +76,8 @@ export default function App() {
       isCronitorLoaded.current = true
     }
   }, [isCronitorLoaded])
+
+  const [groupSeparator, decimalSeparator] = getNumberFormatParts()
 
   // Gas Vehicle State
   const [gasPrice, setGasPrice] = useLocalStorage("gasPrice", 30000)
@@ -241,12 +245,13 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Annual Distance</Label>
-                      <Input
-                        type="number"
+                      <NumberInput
+                        min={0}
+                        stepper={1000}
                         value={annualDistance}
-                        onChange={(e) =>
-                          setAnnualDistance(Number(e.target.value))
-                        }
+                        onValueChange={(v) => v && setAnnualDistance(v)}
+                        thousandSeparator={groupSeparator}
+                        decimalSeparator={decimalSeparator}
                       />
                     </div>
                     <div className="space-y-2">
@@ -286,21 +291,26 @@ export default function App() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Purchase Price ({currency})</Label>
-                    <Input
-                      type="number"
+                    <NumberInput
+                      min={0}
+                      stepper={500}
                       value={gasPrice}
-                      onChange={(e) => setGasPrice(Number(e.target.value))}
+                      onValueChange={(v) => v && setGasPrice(v)}
+                      thousandSeparator={groupSeparator}
+                      decimalSeparator={decimalSeparator}
+                      prefix={currency + ""}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Efficiency</Label>
-                      <Input
-                        type="number"
+                      <NumberInput
+                        min={0}
+                        stepper={0.1}
                         value={gasEfficiency}
-                        onChange={(e) =>
-                          setGasEfficiency(Number(e.target.value))
-                        }
+                        onValueChange={(v) => v && setGasEfficiency(v)}
+                        thousandSeparator={groupSeparator}
+                        decimalSeparator={decimalSeparator}
                       />
                     </div>
                     <div className="space-y-2">
@@ -329,12 +339,15 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Fuel Price</Label>
-                      <Input
-                        type="number"
+                      <NumberInput
+                        min={0}
+                        stepper={0.01}
                         value={gasFuelPrice}
-                        onChange={(e) =>
-                          setGasFuelPrice(Number(e.target.value))
-                        }
+                        onValueChange={(v) => v && setGasFuelPrice(v)}
+                        thousandSeparator={groupSeparator}
+                        decimalSeparator={decimalSeparator}
+                        decimalScale={2}
+                        prefix={currency + ""}
                       />
                     </div>
                     <div className="space-y-2">
@@ -395,21 +408,26 @@ export default function App() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Purchase Price ({currency})</Label>
-                    <Input
-                      type="number"
+                    <NumberInput
+                      min={0}
+                      stepper={5000}
                       value={evPrice}
-                      onChange={(e) => setEvPrice(Number(e.target.value))}
+                      onValueChange={(v) => v && setEvPrice(v)}
+                      thousandSeparator={groupSeparator}
+                      decimalSeparator={decimalSeparator}
+                      prefix={currency + ""}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Efficiency</Label>
-                      <Input
-                        type="number"
+                      <NumberInput
+                        min={0}
+                        stepper={5}
                         value={evEfficiency}
-                        onChange={(e) =>
-                          setEvEfficiency(Number(e.target.value))
-                        }
+                        onValueChange={(v) => v && setEvEfficiency(v)}
+                        thousandSeparator={groupSeparator}
+                        decimalSeparator={decimalSeparator}
                       />
                     </div>
                     <div className="space-y-2">
@@ -437,7 +455,7 @@ export default function App() {
                   </div>
                   <div className="space-y-2">
                     <Label className="flex items-center gap-1">
-                      Electricity Price ({currency}/kWh)
+                      Electricity Price
                       <Tooltip>
                         <TooltipTrigger>
                           <Info className="h-3 w-3 text-slate-400" />
@@ -447,10 +465,14 @@ export default function App() {
                         </TooltipContent>
                       </Tooltip>
                     </Label>
-                    <Input
-                      type="number"
+                    <NumberInput
+                      min={0}
+                      stepper={0.01}
                       value={elecPrice}
-                      onChange={(e) => setElecPrice(Number(e.target.value))}
+                      onValueChange={(v) => v && setElecPrice(v)}
+                      thousandSeparator={groupSeparator}
+                      decimalSeparator={decimalSeparator}
+                      suffix={" " + currency + "/kWh"}
                     />
                   </div>
                   <Expenses
@@ -527,7 +549,7 @@ export default function App() {
               </div>
 
               {/* Chart */}
-              <Card className="border-slate-200 shadow-sm aspect-video">
+              <Card className="aspect-video border-slate-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <TrendingUp className="h-5 w-5 text-indigo-500" />

@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/select"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { NumberInput } from "@/components/ui/number-input"
+import { getNumberFormatParts } from "@/lib/utils"
 import { useLocalStorage } from "@uidotdev/usehooks"
 
 export default function Expenses<T extends string>({
@@ -24,6 +25,8 @@ export default function Expenses<T extends string>({
   defaultExpenseType: T
 }) {
   const [currency] = useLocalStorage("currency", "$")
+
+  const [groupSeparator, decimalSeparator] = getNumberFormatParts()
 
   const addExpense = () => {
     setExpenses((prev) => [...prev, { type: defaultExpenseType, amount: 0 }])
@@ -86,13 +89,16 @@ export default function Expenses<T extends string>({
 
             {/* Amount */}
             <div className="col-span-2 space-y-2">
-              <Label className="text-xs">{currency}/year</Label>
-              <Input
-                type="number"
+              <Label className="text-xs">Amount</Label>
+              <NumberInput
+                min={0}
+                stepper={50}
                 value={expense.amount}
-                onChange={(e) =>
-                  updateExpense(index, "amount", Number(e.target.value))
-                }
+                onValueChange={(v) => v && updateExpense(index, "amount", v)}
+                thousandSeparator={groupSeparator}
+                decimalSeparator={decimalSeparator}
+                decimalScale={2}
+                prefix={currency + ""}
               />
             </div>
 
