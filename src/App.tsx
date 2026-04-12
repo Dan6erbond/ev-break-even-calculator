@@ -45,26 +45,30 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   CartesianGrid,
   Legend,
   Line,
   LineChart,
   Tooltip as RechartsTooltip,
+  ReferenceLine,
   ResponsiveContainer,
   XAxis,
   YAxis,
 } from "recharts"
 
 import { Label } from "@/components/ui/label"
-import { motion } from "motion/react"
+import { AnimatePresence, motion } from "motion/react"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import Expenses from "./components/expenses"
 import { NumberInput } from "@/components/ui/number-input"
 import { getNumberFormatParts } from "@/lib/utils"
 import { AnimatedNumber } from "@/components/ui/animated-number"
 import { FaGithub } from "react-icons/fa"
+import { ShareButton } from "@/components/share-button"
+import { ImportAlert } from "@/components/import-alert"
+import { Switch } from "@/components/ui/switch"
 export default function App() {
   const isCronitorLoaded = useRef(false)
 
@@ -118,6 +122,8 @@ export default function App() {
     "Miles"
   )
   const [currency, setCurrency] = useLocalStorage("currency", "$")
+
+  const [showBreakdown, setShowBreakdown] = useState(false)
 
   const results = useMemo(() => {
     return calculateBreakEven({
@@ -196,9 +202,11 @@ export default function App() {
     <TooltipProvider>
       <div className="min-h-screen bg-background p-4 font-sans text-foreground md:p-8">
         <main className="mx-auto max-w-6xl space-y-8">
+          <ImportAlert />
+
           {/* Header */}
-          <header className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <div>
+          <header className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="mr-auto">
               <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
                 <Zap className="h-8 w-8 text-green-600" />
                 EV Break-Even Calculator
@@ -207,6 +215,28 @@ export default function App() {
                 Compare the long-term costs of switching to electric.
               </p>
             </div>
+
+            <ShareButton
+              params={{
+                gasPrice,
+                gasEfficiency,
+                gasEfficiencyUnit,
+                gasFuelPrice,
+                gasFuelPriceUnit,
+                gasExpenses,
+
+                evPrice,
+                evEfficiency,
+                evEfficiencyUnit,
+                elecPrice,
+                evExpenses,
+
+                annualDistance,
+                distanceUnit,
+                currency,
+              }}
+            />
+
             <div className="flex items-center gap-2 self-start rounded-lg border bg-white p-1 shadow-sm md:self-center">
               <Globe className="ml-2 h-4 w-4 text-slate-400" />
               <Select
@@ -567,17 +597,33 @@ export default function App() {
 
               {/* Chart */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    Total Cost Over Time
-                  </CardTitle>
-                  <CardDescription>
-                    Includes purchase price and cumulative fuel/energy costs.
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                      Total Cost Over Time
+                    </CardTitle>
+                    <CardDescription>
+                      Includes purchase price and cumulative fuel/energy costs.
+                    </CardDescription>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="breakdown"
+                      checked={showBreakdown}
+                      onCheckedChange={setShowBreakdown}
+                    />
+                    <Label
+                      htmlFor="breakdown"
+                      className="text-sm text-muted-foreground"
+                    >
+                      Breakdown
+                    </Label>
+                  </div>
                 </CardHeader>
                 <CardContent className="overflow-x-auto overflow-y-hidden">
-                  <div className="min-w-175 md:min-w-0 aspect-video">
+                  <div className="aspect-video min-w-175 md:min-w-0">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
                         data={results.chartData}
@@ -604,9 +650,11 @@ export default function App() {
                           tick={{ fontSize: 12 }}
                         />
                         <RechartsTooltip
-                          formatter={(value) => [
+                          formatter={(value, name) => [
                             typeof value === "number" && formatCurrency(value),
-                            "",
+                            typeof name === "string"
+                              ? name.replace("Total", "").trim()
+                              : name,
                           ]}
                           contentStyle={{
                             borderRadius: "8px",
@@ -614,80 +662,100 @@ export default function App() {
                             boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                           }}
                         />
-                        <Legend verticalAlign="top" height={36} />
+
+                        <Legend
+                          formatter={(value) => {
+                            if (value.includes("EV")) return `⚡ ${value}`
+                            if (value.includes("Gas")) return `⛽ ${value}`
+                            return value
+                          }}
+                        />
 
                         <Line
                           name="Gas Total"
                           dataKey="gasTotal"
-                          stroke="#f97316"
-                          strokeWidth={2}
+                          stroke="var(--color-destructive)"
+                          strokeWidth={3}
                           dot={false}
                         />
 
                         <Line
                           name="EV Total"
                           dataKey="evTotal"
-                          stroke="#22c55e"
-                          strokeWidth={2}
+                          stroke="var(--color-primary)"
+                          strokeWidth={3}
                           dot={false}
                         />
 
-                        <Line
-                          name="Gas Base (Purchase)"
-                          type="monotone"
-                          dataKey="gasBase"
-                          stroke="#fb923c"
-                          strokeWidth={1}
-                          strokeDasharray="4 4"
-                          dot={false}
-                        />
+                        <AnimatePresence>
+                          {showBreakdown && (
+                            <motion.g
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              {/* GAS */}
+                              <Line
+                                name="Gas Base (Purchase)"
+                                dataKey="gasBase"
+                                stroke="#fed7aa"
+                                strokeWidth={1.5}
+                                strokeDasharray="4 4"
+                                dot={false}
+                              />
 
-                        <Line
-                          name="Gas Fuel"
-                          type="monotone"
-                          dataKey="gasEnergy"
-                          stroke="#f97316"
-                          strokeWidth={2}
-                          dot={false}
-                        />
+                              <Line
+                                name="Gas Fuel"
+                                dataKey="gasEnergy"
+                                stroke="#fb923c"
+                                strokeWidth={2}
+                                dot={false}
+                              />
 
-                        <Line
-                          name="Gas Expenses"
-                          type="monotone"
-                          dataKey="gasFixed"
-                          stroke="#c2410c"
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          dot={false}
-                        />
+                              <Line
+                                name="Gas Expenses"
+                                dataKey="gasFixed"
+                                stroke="#c2410c"
+                                strokeWidth={2}
+                                strokeDasharray="5 5"
+                                dot={false}
+                              />
 
-                        <Line
-                          name="EV Base (Purchase)"
-                          type="monotone"
-                          dataKey="evBase"
-                          stroke="#86efac"
-                          strokeWidth={1}
-                          strokeDasharray="4 4"
-                          dot={false}
-                        />
+                              {/* EV */}
+                              <Line
+                                name="EV Base (Purchase)"
+                                dataKey="evBase"
+                                stroke="#bbf7d0"
+                                strokeWidth={1.5}
+                                strokeDasharray="4 4"
+                                dot={false}
+                              />
 
-                        <Line
-                          name="EV Electricity"
-                          type="monotone"
-                          dataKey="evEnergy"
-                          stroke="#22c55e"
-                          strokeWidth={2}
-                          dot={false}
-                        />
+                              <Line
+                                name="EV Electricity"
+                                dataKey="evEnergy"
+                                stroke="#4ade80"
+                                strokeWidth={2}
+                                dot={false}
+                              />
 
-                        <Line
-                          name="EV Expenses"
-                          type="monotone"
-                          dataKey="evFixed"
-                          stroke="#15803d"
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          dot={false}
+                              <Line
+                                name="EV Expenses"
+                                dataKey="evFixed"
+                                stroke="#15803d"
+                                strokeWidth={2}
+                                strokeDasharray="5 5"
+                                dot={false}
+                              />
+                            </motion.g>
+                          )}
+                        </AnimatePresence>
+
+                        <ReferenceLine
+                          x={results.breakEvenYears}
+                          stroke="var(--color-primary)"
+                          strokeDasharray="3 3"
+                          label="Break-even"
                         />
                       </LineChart>
                     </ResponsiveContainer>
