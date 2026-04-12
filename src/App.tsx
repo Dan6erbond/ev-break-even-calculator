@@ -649,6 +649,15 @@ export default function App() {
                           }
                           tick={{ fontSize: 12 }}
                         />
+
+                        <Legend
+                          formatter={(value) => {
+                            if (value.includes("EV")) return `⚡ ${value}`
+                            if (value.includes("Gas")) return `⛽ ${value}`
+                            return value
+                          }}
+                        />
+                        
                         <RechartsTooltip
                           formatter={(value, name) => [
                             typeof value === "number" && formatCurrency(value),
@@ -660,14 +669,6 @@ export default function App() {
                             borderRadius: "8px",
                             border: "1px solid #e2e8f0",
                             boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                          }}
-                        />
-
-                        <Legend
-                          formatter={(value) => {
-                            if (value.includes("EV")) return `⚡ ${value}`
-                            if (value.includes("Gas")) return `⛽ ${value}`
-                            return value
                           }}
                         />
 
