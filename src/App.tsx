@@ -70,6 +70,23 @@ import { ShareButton } from "@/components/share-button"
 import { ImportAlert } from "@/components/import-alert"
 import { Switch } from "@/components/ui/switch"
 import TireDegradation from "@/components/tire-degradation"
+import { EVPresetChip, type EVPreset } from "@/components/ev-preset-chip"
+
+const EV_PRESETS: EVPreset[] = [
+  {
+    label: "BMW iX3 M50 xDrive (2026)",
+    efficiencyWhPerKm: 178,
+  },
+  {
+    label: "Tesla Model 3 RWD Highland",
+    efficiencyWhPerKm: 135,
+  },
+  {
+    label: "Fiat 500e 42kWh",
+    efficiencyWhPerKm: 159,
+  },
+]
+
 export default function App() {
   const isCronitorLoaded = useRef(false)
 
@@ -509,6 +526,25 @@ export default function App() {
                           </SelectGroup>
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    <div className="col-span-2 space-y-2">
+                      <Label className="text-muted-foreground">
+                        Popular EVs
+                      </Label>
+                      <div className="flex flex-wrap gap-2">
+                        {EV_PRESETS.map((preset) => (
+                          <EVPresetChip
+                            key={preset.label}
+                            label={preset.label}
+                            efficiencyWhPerKm={preset.efficiencyWhPerKm}
+                            unit={evEfficiencyUnit}
+                            onSelect={(value) =>
+                              setEvEfficiency(Number(value.toFixed(2)))
+                            }
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-2">
