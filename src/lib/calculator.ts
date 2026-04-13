@@ -168,6 +168,15 @@ export interface CalculationResult {
   }
 }
 
+function calcAnnualTireCost(
+  annualKM: number,
+  tireCost?: number,
+  tireLifespanKM?: number
+) {
+  if (!tireCost || !tireLifespanKM || tireLifespanKM <= 0) return 0
+  return (annualKM / tireLifespanKM) * tireCost
+}
+
 export function calculateBreakEven(params: {
   gasPrice: number
   gasFuelPrice: number
@@ -175,11 +184,15 @@ export function calculateBreakEven(params: {
   gasEfficiencyUnit: GasUnit
   gasFuelPriceUnit: FuelPriceUnit
   gasExpenses: GasExpense[]
+  gasTireCost?: number
+  gasTireLifespan?: number
   evPrice: number
   evEfficiency: number
   evEfficiencyUnit: EVUnit
   elecPrice: number // per kWh
   evExpenses: EVExpense[]
+  evTireCost?: number
+  evTireLifespan?: number
   annualDistance: number
   distanceUnit: DistanceUnit
 }): CalculationResult {
@@ -197,13 +210,36 @@ export function calculateBreakEven(params: {
   const gasEnergyPerYear = gasCostPerKM * annualKM
   const evEnergyPerYear = evCostPerKM * annualKM
 
+  const gasTireLifespanKM = params.gasTireLifespan
+    ? toKM(params.gasTireLifespan, params.distanceUnit)
+    : undefined
+
+  const evTireLifespanKM = params.evTireLifespan
+    ? toKM(params.evTireLifespan, params.distanceUnit)
+    : undefined
+
+  const gasTirePerYear = calcAnnualTireCost(
+    annualKM,
+    params.gasTireCost,
+    gasTireLifespanKM
+  )
+
+  const evTirePerYear = calcAnnualTireCost(
+    annualKM,
+    params.evTireCost,
+    evTireLifespanKM
+  )
+
   // annual fixed costs
   const gasFixedPerYear = params.gasExpenses.reduce(
     (sum, e) => sum + e.amount,
-    0
+    gasTirePerYear
   )
 
-  const evFixedPerYear = params.evExpenses.reduce((sum, e) => sum + e.amount, 0)
+  const evFixedPerYear = params.evExpenses.reduce(
+    (sum, e) => sum + e.amount,
+    evTirePerYear
+  )
 
   // total annual costs
   const gasCostPerYear = gasEnergyPerYear + gasFixedPerYear

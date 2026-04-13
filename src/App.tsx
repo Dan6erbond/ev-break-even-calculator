@@ -69,6 +69,7 @@ import { FaGithub } from "react-icons/fa"
 import { ShareButton } from "@/components/share-button"
 import { ImportAlert } from "@/components/import-alert"
 import { Switch } from "@/components/ui/switch"
+import TireDegradation from "@/components/tire-degradation"
 export default function App() {
   const isCronitorLoaded = useRef(false)
 
@@ -98,6 +99,11 @@ export default function App() {
     "gasExpenses",
     []
   )
+  const [gasTireCost, setGasTireCost] = useLocalStorage("gasTireCost", 500)
+  const [gasTireLifespan, setGasTireLifespan] = useLocalStorage(
+    "gasTireLifespan",
+    40000
+  )
 
   // EV State
   const [evPrice, setEvPrice] = useLocalStorage("evPrice", 45000)
@@ -110,6 +116,11 @@ export default function App() {
   const [evExpenses, setEvExpenses] = useLocalStorage<EVExpense[]>(
     "evExpenses",
     []
+  )
+  const [evTireCost, setEvTireCost] = useLocalStorage("evTireCost", 500)
+  const [evTireLifespan, setEvTireLifespan] = useLocalStorage(
+    "evTireLifespan",
+    30000
   )
 
   // General State
@@ -133,11 +144,15 @@ export default function App() {
       gasEfficiencyUnit,
       gasFuelPriceUnit,
       gasExpenses,
+      gasTireCost,
+      gasTireLifespan,
       evPrice,
       evEfficiency,
       evEfficiencyUnit,
       elecPrice,
       evExpenses,
+      evTireCost,
+      evTireLifespan,
       annualDistance,
       distanceUnit,
     })
@@ -148,11 +163,15 @@ export default function App() {
     gasEfficiencyUnit,
     gasFuelPriceUnit,
     gasExpenses,
+    gasTireCost,
+    gasTireLifespan,
     evPrice,
     evEfficiency,
     evEfficiencyUnit,
     elecPrice,
     evExpenses,
+    evTireCost,
+    evTireLifespan,
     annualDistance,
     distanceUnit,
   ])
@@ -426,6 +445,12 @@ export default function App() {
                       "Other",
                     ]}
                   />
+                  <TireDegradation
+                    tireCost={gasTireCost}
+                    setTireCost={setGasTireCost}
+                    tireLifespan={gasTireLifespan}
+                    setTireLifespan={setGasTireLifespan}
+                  />
                 </CardContent>
               </Card>
 
@@ -528,6 +553,12 @@ export default function App() {
                       "Software / Subscription",
                       "Other",
                     ]}
+                  />
+                  <TireDegradation
+                    tireCost={evTireCost}
+                    setTireCost={setEvTireCost}
+                    tireLifespan={evTireLifespan}
+                    setTireLifespan={setEvTireLifespan}
                   />
                 </CardContent>
               </Card>
@@ -657,7 +688,7 @@ export default function App() {
                             return value
                           }}
                         />
-                        
+
                         <RechartsTooltip
                           formatter={(value, name) => [
                             typeof value === "number" && formatCurrency(value),
