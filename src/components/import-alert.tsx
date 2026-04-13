@@ -65,7 +65,9 @@ export function ImportAlert() {
     const hasParams =
       params.has("gasPrice") ||
       params.has("evPrice") ||
-      params.has("annualDistance")
+      params.has("annualDistance") ||
+      params.has("distanceUnit") ||
+      params.has("currency")
 
     if (hasParams) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
