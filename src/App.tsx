@@ -316,7 +316,7 @@ export default function App() {
                         min={0}
                         stepper={1000}
                         value={annualDistance}
-                        onValueChange={(v) => v && setAnnualDistance(v)}
+                        onValueChange={(v) => v != null && setAnnualDistance(v)}
                         thousandSeparator={groupSeparator}
                         decimalSeparator={decimalSeparator}
                       />
@@ -362,7 +362,7 @@ export default function App() {
                       min={0}
                       stepper={500}
                       value={gasPrice}
-                      onValueChange={(v) => v && setGasPrice(v)}
+                      onValueChange={(v) => v != null && setGasPrice(v)}
                       thousandSeparator={groupSeparator}
                       decimalSeparator={decimalSeparator}
                       prefix={currency + ""}
@@ -375,7 +375,7 @@ export default function App() {
                         min={0}
                         stepper={0.1}
                         value={gasEfficiency}
-                        onValueChange={(v) => v && setGasEfficiency(v)}
+                        onValueChange={(v) => v != null && setGasEfficiency(v)}
                         thousandSeparator={groupSeparator}
                         decimalSeparator={decimalSeparator}
                         decimalScale={2}
@@ -411,7 +411,7 @@ export default function App() {
                         min={0}
                         stepper={0.01}
                         value={gasFuelPrice}
-                        onValueChange={(v) => v && setGasFuelPrice(v)}
+                        onValueChange={(v) => v != null && setGasFuelPrice(v)}
                         thousandSeparator={groupSeparator}
                         decimalSeparator={decimalSeparator}
                         decimalScale={2}
@@ -486,7 +486,7 @@ export default function App() {
                       min={0}
                       stepper={5000}
                       value={evPrice}
-                      onValueChange={(v) => v && setEvPrice(v)}
+                      onValueChange={(v) => v != null && setEvPrice(v)}
                       thousandSeparator={groupSeparator}
                       decimalSeparator={decimalSeparator}
                       prefix={currency + ""}
@@ -499,7 +499,7 @@ export default function App() {
                         min={0}
                         stepper={5}
                         value={evEfficiency}
-                        onValueChange={(v) => v && setEvEfficiency(v)}
+                        onValueChange={(v) => v != null && setEvEfficiency(v)}
                         thousandSeparator={groupSeparator}
                         decimalSeparator={decimalSeparator}
                         decimalScale={2}
@@ -563,7 +563,7 @@ export default function App() {
                       min={0}
                       stepper={0.01}
                       value={elecPrice}
-                      onValueChange={(v) => v && setElecPrice(v)}
+                      onValueChange={(v) => v != null && setElecPrice(v)}
                       thousandSeparator={groupSeparator}
                       decimalSeparator={decimalSeparator}
                       decimalScale={2}
